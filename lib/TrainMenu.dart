@@ -28,7 +28,7 @@ class _TrainMenuState extends State<TrainMenu> with TickerProviderStateMixin{
   List<String> colors = ['0xFFE53935','0xFF607D8B','0xFF66BB6A','0xFFFFCA28','0xFFF57C00','0xFF3949AB','0xFF00E676','0xFF00E5FF','0xFF7E57C2','0xFFFFFFFF','0xFFC6FF00','0xFFD500F9'];
   List<dynamic> countOfTrain() {
     var data = [];
-    for(int i = 1;i < _listOfArray.length;i++){
+    for(int i = 1; i < _listOfArray.length; i++){
       _listOfArray[i][3] == 'true' ? data.add(i) : null;
     }
     return data;
@@ -136,6 +136,7 @@ class _TrainMenuState extends State<TrainMenu> with TickerProviderStateMixin{
       content: Column(
         children: <Widget>[
           TextField(
+            maxLength: 15,
             controller: controllerT,
             decoration: InputDecoration(
               labelText: 'Название',
@@ -236,17 +237,10 @@ class _TrainMenuState extends State<TrainMenu> with TickerProviderStateMixin{
       closeFunction: null,
     ).show();
   }
-  _load() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    if(prefs.getStringList('list')!= null){
-      setState(() {
-        listOfString = prefs.getStringList('list');
-      });
-      _listOfArray = [];
-      for(int i = 0; i < listOfString[widget.currentPage].split('.').length;i++){
-        if(i == 0) _listOfArray.add(listOfString[widget.currentPage].split('.')[0]);
-        else _listOfArray.add(listOfString[widget.currentPage].split('.')[i].split(','));
-      }
+  _load() {
+    for(int i = 0; i < listOfString[widget.currentPage].split('.').length;i++){
+      if(i == 0) _listOfArray.add(listOfString[widget.currentPage].split('.')[0]);
+      else _listOfArray.add(listOfString[widget.currentPage].split('.')[i].split(','));
     }
   }
   _save() async {

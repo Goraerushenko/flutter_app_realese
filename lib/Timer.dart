@@ -136,6 +136,7 @@ class _TimerForTrainState extends State<TimerForTrain>
           controller.value = 1;
           controller.reverse(from: 1);
         } else if(j+1 < int.parse( widget.listOfArray[0])) {
+          player.play("startAndbetween.mp3");
           j++;
           i = 1;
           duration = Duration(minutes: int.parse( widget.listOfArray[i][0].split(' ')[0]),seconds: int.parse( widget.listOfArray[i][0].split(' ')[1]),);

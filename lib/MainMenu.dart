@@ -29,6 +29,7 @@ class _MenuState extends State<Menu>
           content: Column(
             children: <Widget>[
               TextField(
+                maxLength: 20,
                 controller: controller,
                 decoration: InputDecoration(
                   labelText: 'Название',
@@ -45,7 +46,14 @@ class _MenuState extends State<Menu>
               ),
               onPressed: (){
                 setState(() {
-                  title.insert(0,controller.text.length == 0 ? 'Тренировка ${title.length + 1}' : controller.text);
+                  int i = 1;
+                  if(controller.text.length == 0){
+                    while(title.contains('Тренировка $i')){
+                      i++;
+                    }
+                    controller.text = 'Тренировка $i';
+                  }
+                  title.insert(0, controller.text);
                   controller.clear();
                   listOfString.insert(0, '1');
                   _save();
@@ -120,7 +128,6 @@ class _MenuState extends State<Menu>
         }
       },
           icon: Icon(Icons.undo,color: Colors.blue,), label: Text('UNDO',style: TextStyle(color: Colors.blue),)),
-      onTap: (c){print(c);},
     )..show(context);
   }
   void _onClickDel(){
@@ -160,6 +167,7 @@ class _MenuState extends State<Menu>
       content: Column(
         children: <Widget>[
           TextField(
+            maxLength: 20,
             controller: controller,
             decoration: InputDecoration(
               labelText: title[currentPage.round()],
@@ -195,71 +203,75 @@ class _MenuState extends State<Menu>
     _load();
     super.initState();
   }
+
   _load() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    if(prefs.getStringList('title')!= null){
-      setState(() {
-        title = prefs.getStringList('title');
-        listOfString = prefs.getStringList('list');
+        if(prefs.getStringList('title')!= null){
+          setState(() {
+            title = prefs.getStringList('title');
+            listOfString = prefs.getStringList('list');
       });
     }
   }
+
   _save() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setStringList('title', title);
     prefs.setStringList('list', listOfString);
   }
+
   @override
   Widget build(BuildContext context) {
     PageController controller = PageController(initialPage: title.length - 1);
     void _onClickPage(){
       if(currentPage.round() >= 0 && title.length != 0)
         Navigator.of(context).push(
-            MaterialPageRoute(builder: (context) => TrainMenu(currentPage:currentPage.round(),size: MediaQuery.of(context).size)));
+          MaterialPageRoute(builder: (context) => TrainMenu(currentPage:currentPage.round(),size: MediaQuery.of(context).size)));
     }
     controller.addListener(() {
-        setState(() {
-          currentPage = controller.page;
-        });
+      setState(() => currentPage = controller.page);
     });
+
     return Scaffold(
-          backgroundColor: Colors.white,
-          body: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                GestureDetector(
-                  onTap:_onClickPage,
-                  child:  Stack(
-                    children: <Widget>[
-                      CardScrollWidget(currentPage),
-                      Positioned.fill(
-                        child: PageView.builder(
-                          itemCount: title.length,
-                          controller: controller,
-                          reverse: true,
-                          itemBuilder: (context, index) {
-                            return Container();
-                          },
-                        ),
-                      ),
-                    ],
+      backgroundColor: Colors.white,
+      body: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            GestureDetector(
+              onTap:_onClickPage,
+              child:  Stack(
+                children: <Widget>[
+                  CardScrollWidget(currentPage),
+                  Positioned.fill(
+                    child: PageView.builder(
+                      itemCount: title.length,
+                      controller: controller,
+                      reverse: true,
+                      itemBuilder: (context, index) {
+                        return Container();
+                      },
+                    ),
                   ),
-                )
-              ],
-            ),
-          ),
-          floatingActionButton: _addBtn(),
-          floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-          bottomNavigationBar: _bottomAppBar()
-      );
+                ],
+              ),
+            )
+          ],
+        ),
+      ),
+      floatingActionButton: _addBtn(),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      bottomNavigationBar: _bottomAppBar()
+    );
   }
+
   Widget _addBtn() => FloatingActionButton(
     onPressed: _onPressedAdd,
     backgroundColor: color,
     tooltip: 'Дабавить',
     child: Icon(Icons.add),
   );
+
   Widget _bottomAppBar() => BottomAppBar(
     shape: CircularNotchedRectangle(),
     notchMargin: 4.0,
@@ -328,10 +340,11 @@ class CardScrollWidget extends StatelessWidget {
               child: Container(
                 decoration: BoxDecoration(color: Colors.white, boxShadow: [
                   BoxShadow(
-                      color: Colors.black12,
-                      offset: Offset(3.0, 6.0),
-                      blurRadius: 10.0)
-                ]),
+                    color: Colors.black12,
+                    offset: Offset(3.0, 6.0),
+                    blurRadius: 10.0)
+                  ]
+                 ),
                 child: AspectRatio(
                   aspectRatio: cardAspectRatio,
                   child: Stack(
@@ -345,17 +358,18 @@ class CardScrollWidget extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             Padding(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 16.0, vertical: 8.0),
-                                child: Row(
-                                  children: <Widget>[
-                                    Text(title[i],
-                                        style: TextStyle(
-                                            color: color,
-                                            fontSize: 20.0,
-                                            fontFamily: "SF-Pro-Text-Regular")),
-                                  ],
-                                )
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 16.0, vertical: 8.0
+                              ),
+                              child: Row(
+                                children: <Widget>[
+                                  Text(title[i],
+                                    style: TextStyle(
+                                      color: color,
+                                      fontSize: 20.0,
+                                      fontFamily: "SF-Pro-Text-Regular")),
+                                ],
+                              )
                             ),
                             SizedBox(
                               height: 10.0,
@@ -371,6 +385,7 @@ class CardScrollWidget extends StatelessWidget {
           );
           cardList.add(cardItem);
         }
+
         return Stack(
           children: cardList,
         );
